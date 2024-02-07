@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+// #include <optional>
 
 #include "falaise/snemo/processing/module.h"
 // Data tools
@@ -10,24 +12,23 @@
 
 
 class Module {
+ falaise::path model_path;
+ cppflow::model* model;
+
  public:
-  // Default constructor
   Module() = default;
-  // User-defined Constructor
-  Module(falaise::property_set const& /*ps*/,
-           datatools::service_manager& /*services*/) {
-					    // Create a tensor from a list, a = [1.0, 2.0, 3.0]
-    auto a = cppflow::tensor({1.0, 2.0, 3.0});
-    // Create a tensor of shape 3 filled with 1.0, b = [1.0, 1.0, 1.0]
-    auto b = cppflow::fill({3}, 1.0);
+  Module(falaise::property_set const& ps, datatools::service_manager& services) {
+    
+		this->model_path = ps.get<falaise::path>("model.path");
 
-    std::cout << a + b << std::endl;
-
+		this->model = new cppflow::model(static_cast<std::string>(model_path));
+		std::cout<<"Loaded"<<std::endl;
   }
-  // Process event
+	
   falaise::processing::status process(datatools::things& workI) {
   	if(workI.has("CD")) 
 	{
+	std::cout<<"processing"<<std::endl;
 		// Get the CD data
 			snemo::datamodel::calibrated_data CD = workI.get<snemo::datamodel::calibrated_data>("CD");
     double X, Y, Z, R;

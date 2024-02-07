@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.9)
 
 project(module)
 
+# set(CMAKE_CXX_STANDARD 17)
+# set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_CXX_EXTENSIONS OFF)
+
 set(cppflow_DIR /sps/nemo/scratch/amendl/AI/falaise_module/cppflow)
 
 find_package(Falaise REQUIRED)
