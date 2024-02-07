@@ -1,15 +1,16 @@
-# Check cmake version meets our requirements
 cmake_minimum_required(VERSION 3.9)
-# Declare project, which will configure compiler for us
+
 project(module)
-# Modules use Falaise, so we need to locate this or fail
-# Locating Falaise will automatically locate all of its
-# dependencies such as Bayeux, ROOT and Boost.
+
+set(cppflow_DIR /sps/nemo/scratch/amendl/AI/falaise_module/cppflow)
+
 find_package(Falaise REQUIRED)
-# Build a shared/dynamic library from our source
+# find_package(cppflow REQUIRED)
+
 add_library(module SHARED src/lib.cpp)
-# Link this library to the FalaiseModule library
-# This ensures the correct compiler flags, include paths
-# and linker flags are used to compile our library.
-target_link_libraries(module Falaise::FalaiseModule)
+# target_include_directories(module SHARED cppflow::cppflow)
+include_directories(/sps/nemo/scratch/amendl/AI/falaise_module/cppflow/include)
+include_directories(/sps/nemo/scratch/amendl/AI/falaise_module/TF_C_API/include)
+
+target_link_libraries(module Falaise::FalaiseModule tensorflow)
 

@@ -6,6 +6,9 @@
 #include "falaise/snemo/datamodels/calibrated_data.h"
 #include "falaise/snemo/datamodels/particle_track_data.h"
 
+#include <cppflow/cppflow.h>
+
+
 class Module {
  public:
   // Default constructor
@@ -13,6 +16,13 @@ class Module {
   // User-defined Constructor
   Module(falaise::property_set const& /*ps*/,
            datatools::service_manager& /*services*/) {
+					    // Create a tensor from a list, a = [1.0, 2.0, 3.0]
+    auto a = cppflow::tensor({1.0, 2.0, 3.0});
+    // Create a tensor of shape 3 filled with 1.0, b = [1.0, 1.0, 1.0]
+    auto b = cppflow::fill({3}, 1.0);
+
+    std::cout << a + b << std::endl;
+
   }
   // Process event
   falaise::processing::status process(datatools::things& workI) {
