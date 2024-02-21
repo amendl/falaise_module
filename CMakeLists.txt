@@ -13,8 +13,6 @@ find_package(Falaise REQUIRED)
 
 add_library(module SHARED src/lib.cpp)
 # target_include_directories(module SHARED cppflow::cppflow)
-include_directories(/sps/nemo/scratch/amendl/AI/falaise_module/cppflow/include)
-include_directories(/sps/nemo/scratch/amendl/AI/falaise_module/TF_C_API/include)
 
 target_link_libraries(module Falaise::FalaiseModule tensorflow)
 
