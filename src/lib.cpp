@@ -2,8 +2,7 @@
 #include <fstream>
 #include <string>
 #include <stdexcept>
-
-// #include <optional>
+#include <algorithm>
 
 #include "falaise/snemo/processing/module.h"
 // Data tools
@@ -31,8 +30,10 @@ private:
 
 	std::string model_path;
   cppflow::model* model;
-
-
+	
+	std::vector<float> cache_9_113 = std::vector<float>(9*113,0.);
+	
+	cppflow::tensor get_tensor_from_CD_bank(const snemo::datamodel::calibrated_data&falaiseCDbank);
 
 
 	DPP_MODULE_REGISTRATION_INTERFACE(FirstAIModule)
@@ -57,6 +58,14 @@ void FirstAIModule::initialize(const datatools::properties & module_properties, 
 }
 dpp::chain_module::process_status FirstAIModule::process (datatools::things & event) 
 {
+  if(!event.has("CD")) return falaise::processing::status::PROCESS_FATAL;
+	// snemo::datamodel::calibrated_data falaiseCDbank = workItem.get<calibrated_data>("CD");
+  auto c = get_tensor_from_CD_bank(event.get<snemo::datamodel::calibrated_data>("CD"));
+ //  auto result_tensor = .get_tensor()
+	// float* raw_data = static_cast<float*>(TF_TensorData(result_tensor.get()));
+	std::cout<<std::endl<<std::endl<<"After return"<<std::endl;
+	int result = static_cast<float*>(TF_TensorData(cppflow::arg_max(model->operator()(c),1).get_tensor().get()))[0]+0.1;
+  classification[result]+=1;
 	return falaise::processing::status::PROCESS_OK;
 }
 void FirstAIModule::reset() 
@@ -79,6 +88,14 @@ FirstAIModule::~FirstAIModule()
 	}
 }
 
+cppflow::tensor FirstAIModule::get_tensor_from_CD_bank(const snemo::datamodel::calibrated_data&falaiseCDbank)
+{
+	std::fill(this->cache_9_113.begin(),this->cache_9_113.end(),0.);
+	for ( auto &trhit : falaiseCDbank.tracker_hits() )
+	    this->cache_9_113[trhit->get_layer()*113+trhit->get_row()] = 1.;
+std::cout<<std::endl<<std::endl<<"Before return "<<cache_9_113.size()<<std::endl<<std::endl;
+	return cppflow::tensor(this->cache_9_113, {9,113});
+}
 
 
   // Module(falaise::property_set const& ps, datatools::service_manager& services) {

@@ -1,5 +1,5 @@
 cd /sps/nemo/scratch/amendl/AI/falaise_module
-source /sps/nemo/scratch/amendl/AI/physical_simulation/load_falaise4.sh
+source /sps/nemo/scratch/amendl/AI/physical_simulation/load_falaise5.sh
 module add cmake
 rm -rf build
 mkdir build
