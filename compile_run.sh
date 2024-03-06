@@ -9,4 +9,4 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/sps/nemo/scratch/amendl/AI/falaise_modu
 cd build
 cmake ../
 make
-mv libmodule.so libModule.so
+mv libmodule.so libFirstAIModule.so
