@@ -4,8 +4,6 @@
 #include <stdexcept>
 #include <algorithm>
 
-#include <common.h>
-
 #include "falaise/snemo/processing/module.h"
 // Data tools
 #include <bayeux/mctools/simulated_data.h>
@@ -18,15 +16,16 @@
 #include <cppflow/cppflow.h>
 
 
-class FirstAIModule : public dpp::chain_module {
+
+class EnergyHistogramModule : public dpp::chain_module {
 
 public:
 	void 	initialize (const datatools::properties & module_properties, datatools::service_manager &, dpp::module_handle_dict_type &) override;
 	dpp::chain_module::process_status process (datatools::things & event) override;
   void reset() override;
 	
-  FirstAIModule();
-	~FirstAIModule();
+  EnergyHistogramModule();
+	~EnergyHistogramModule();
 private:
 	float classification[4] = {0.,0.,0.,0.};
 
@@ -37,19 +36,31 @@ private:
 	
 	cppflow::tensor get_tensor_from_CD_bank(const snemo::datamodel::calibrated_data&falaiseCDbank);
 
-	
+	int my_simple_argmax(std::vector<float> &data) {
+		float max = -1000.;
+		int max_index = 0;
+		for (size_t i =0;i<data.size();i++) {
+			if (data[i]>max) {
+				max = data[i];
+				max_index = i;
+			}
+			
+		}
+		return max_index;
+	}
 
-	DPP_MODULE_REGISTRATION_INTERFACE(FirstAIModule)
+
+	DPP_MODULE_REGISTRATION_INTERFACE(EnergyHistogramModule)
 
 
 };
 
 
 
-DPP_MODULE_REGISTRATION_IMPLEMENT(FirstAIModule, "FirstAIModule")
+DPP_MODULE_REGISTRATION_IMPLEMENT(EnergyHistogramModule, "EnergyHistogramModule")
 // Register module with Falaise's plugin system on load
 // FALAISE_REGISTER_MODULE(Module)
-void FirstAIModule::initialize(const datatools::properties & module_properties, datatools::service_manager &, dpp::module_handle_dict_type &)
+void EnergyHistogramModule::initialize(const datatools::properties & module_properties, datatools::service_manager &, dpp::module_handle_dict_type &)
 {
 	if(module_properties.has_key("model_path")) 
 	  this->model_path=module_properties.fetch_path("model_path");
@@ -59,7 +70,7 @@ void FirstAIModule::initialize(const datatools::properties & module_properties, 
 
 	this->_set_initialized(true);
 }
-dpp::chain_module::process_status FirstAIModule::process (datatools::things & event) 
+dpp::chain_module::process_status EnergyHistogramModule::process (datatools::things & event) 
 {
   std::cout<<classification[0]+classification[1]+classification[2]+classification[3]<<std::endl;
   if(!event.has("CD")) return falaise::processing::status::PROCESS_FATAL;
@@ -79,7 +90,7 @@ dpp::chain_module::process_status FirstAIModule::process (datatools::things & ev
   classification[my_simple_argmax(result)]+=1;
 	return falaise::processing::status::PROCESS_OK;
 }
-void FirstAIModule::reset() 
+void EnergyHistogramModule::reset() 
 {	
 	this->_set_initialized(false);
 	// Save all data
@@ -92,15 +103,15 @@ void FirstAIModule::reset()
 }
 
 
-FirstAIModule::FirstAIModule() : dpp::chain_module() { }
-FirstAIModule::~FirstAIModule()
+EnergyHistogramModule::EnergyHistogramModule() : dpp::chain_module() { }
+EnergyHistogramModule::~EnergyHistogramModule()
 {
 	if (this->is_initialized()) {
 		this->reset();
 	}
 }
 
-cppflow::tensor FirstAIModule::get_tensor_from_CD_bank(const snemo::datamodel::calibrated_data&falaiseCDbank)
+cppflow::tensor EnergyHistogramModule::get_tensor_from_CD_bank(const snemo::datamodel::calibrated_data&falaiseCDbank)
 {
 	std::fill(this->cache_9_113.begin(),this->cache_9_113.end(),0.);
 	for ( auto &trhit : falaiseCDbank.tracker_hits() )
@@ -170,4 +181,5 @@ cppflow::tensor FirstAIModule::get_tensor_from_CD_bank(const snemo::datamodel::c
  //    return falaise::processing::status::PROCESS_OK;
  //  }
 // private:
+
 
